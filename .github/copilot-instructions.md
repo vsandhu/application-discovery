@@ -2,6 +2,16 @@
 
 This repository uses GitHub Copilot for evidence-backed application discovery.
 
+## Runtime environment
+
+The primary developer environment is Windows 11.
+
+- Prefer PowerShell (`powershell.exe` / `pwsh`) for scripts and validation.
+- Do not assume Bash, `grep`, `sed`, `awk`, `chmod`, `find`, or other Unix-only commands are available.
+- Do not invoke `.sh` scripts from Copilot hooks.
+- When repository automation needs to run locally on Windows, provide a native `.ps1` implementation.
+- Keep discovery logic portable where practical, but treat Windows compatibility as a hard requirement for local hooks.
+
 ## Safety
 
 - Do not modify application source code during discovery.
@@ -29,6 +39,12 @@ Assign confidence:
 - Unknown
 
 Prefer direct repository evidence over assumptions.
+
+## Canonical model
+
+`discovery/discovery-model.yaml` is the source of truth for discovery findings.
+
+Markdown documents are views of the model, not independent sources of truth.
 
 ## Discovery output
 
