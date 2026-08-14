@@ -1,4 +1,4 @@
-version: "1.0"
+version: "1.1"
 metadata:
   repository: ""
   commit: ""
@@ -7,11 +7,22 @@ metadata:
   status: "in-progress"
 
 application:
+  id: "application:main"
   name: ""
   purpose: ""
   scope: ""
   actors: []
   boundaries: []
+
+# Canonical cross-domain entities. Category-specific sections below are
+# projections/convenience groupings; stable IDs should be reused everywhere.
+entities: []
+
+# Canonical claims discovered by the agent.
+findings: []
+
+# Canonical relationships between entities/findings.
+relationships: []
 
 components: []
 
