@@ -1,0 +1,62 @@
+version: "1.0"
+metadata:
+  repository: ""
+  commit: ""
+  discovered_at: ""
+  agent: "application-discovery"
+  status: "in-progress"
+
+application:
+  name: ""
+  purpose: ""
+  scope: ""
+  actors: []
+  boundaries: []
+
+components: []
+
+business_domains: []
+
+architecture:
+  style: []
+  components: []
+  interactions: []
+  deployment: []
+
+technology_stack:
+  languages: []
+  frameworks: []
+  libraries: []
+  databases: []
+  messaging: []
+  apis: []
+  infrastructure: []
+  build_and_delivery: []
+  observability: []
+
+non_functional:
+  scalability: []
+  availability: []
+  resilience: []
+  performance: []
+  security: []
+  reliability: []
+  observability: []
+  maintainability: []
+  recoverability: []
+
+databases:
+  technologies: []
+  schemas: []
+  tables: []
+  relationships: []
+  views: []
+  procedures: []
+  triggers: []
+
+integrations: []
+
+evidence: []
+
+open_questions: []
+conflicts: []
