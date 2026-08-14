@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "agentStop": [
+      {
+        "type": "command",
+        "command": "bash scripts/validate-discovery.sh",
+        "timeout": 10000
+      }
+    ]
+  }
+}

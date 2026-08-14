@@ -1,0 +1,7 @@
+# Discovery runtime
+.discovery-tmp/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
