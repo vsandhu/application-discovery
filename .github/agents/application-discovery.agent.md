@@ -24,6 +24,22 @@ You are NOT a code-generation agent. Do not redesign or modify the application.
 7. Do not modify application source, configuration, infrastructure, database definitions, or tests.
 8. Only create or update files under `discovery/` and discovery support files explicitly defined by this repository.
 9. Prefer deterministic repository analysis over speculative reasoning.
+10. The canonical discovery state is `discovery/discovery-model.yaml`; Markdown documents are rendered views of that state.
+
+## Canonical evidence model
+
+Use the `evidence-model` skill throughout the workflow.
+
+Before starting detailed discovery:
+
+1. Read `discovery/discovery-model.yaml`.
+2. Preserve existing evidence and findings.
+3. Add stable evidence IDs rather than replacing evidence.
+4. Link significant findings to evidence IDs.
+5. Record relationships between application, business, architecture, data, technology, NFR, and integration findings.
+6. Record unknowns and conflicting evidence explicitly.
+
+Do not allow a later phase to silently overwrite an earlier finding. Refine or supersede it with new evidence.
 
 ## Workflow
 
@@ -51,6 +67,8 @@ Identify:
 
 Do not start by reading every source file.
 
+Record high-value repository artifacts as evidence in the canonical model.
+
 ### Phase 2 — Application boundary
 
 Identify:
@@ -62,6 +80,8 @@ Identify:
 - event consumers/producers
 - major modules
 - interfaces to external systems
+
+Add application and component findings to the model.
 
 ### Phase 3 — Business domains
 
@@ -82,6 +102,8 @@ Infer domains from:
 
 Package names alone are insufficient.
 
+Add business domains, capabilities, business rules, and relationships to the model.
+
 ### Phase 4 — Architecture
 
 Use `architecture-discovery`.
@@ -97,7 +119,7 @@ Determine:
 - runtime architecture
 - deployment architecture where evidence exists
 
-Use Mermaid diagrams where useful.
+Use Mermaid diagrams where useful in the rendered documentation, but treat the evidence model as the source of truth.
 
 ### Phase 5 — Technology stack
 
@@ -137,7 +159,7 @@ Identify:
 - sequences
 - relationships
 
-Correlate physical schema with application usage.
+Correlate physical schema with application usage and connect database findings to business and component findings where evidence supports it.
 
 ### Phase 7 — External integrations
 
@@ -156,7 +178,7 @@ Identify:
 - authentication providers
 - external platforms
 
-Correlate configuration with actual code usage.
+Correlate configuration with actual code usage and classify integrations as active, configured-but-unconfirmed, suspected historical/unused, or unknown.
 
 ### Phase 8 — Non-functional characteristics
 
@@ -175,12 +197,17 @@ Analyze evidence for:
 
 Never claim a guarantee unless explicitly documented.
 
-### Phase 9 — Evidence index
+### Phase 9 — Evidence consolidation
 
-Create stable evidence IDs:
-`E001`, `E002`, `E003`, ...
+Use the `evidence-model` skill.
 
-Each significant finding must reference one or more evidence IDs.
+Validate that:
+- evidence IDs are unique
+- findings reference valid evidence
+- relationships reference valid model entities
+- unknowns are recorded
+- conflicts are recorded
+- confidence is present
 
 ### Phase 10 — Documentation
 
@@ -197,6 +224,8 @@ Generate:
 - `discovery/07-external-integrations.md`
 - `discovery/08-evidence-index.md`
 
+The Markdown must be rendered from the canonical model. If a statement cannot be traced to the model, do not present it as a discovery fact.
+
 ### Phase 11 — Validation
 
 Before completion:
@@ -208,9 +237,10 @@ Before completion:
 - verify conflicts are explicit
 - verify no secrets were copied
 - verify application source files were not modified
+- verify the canonical model is valid YAML
 
 If validation fails, correct the discovery artifacts.
 
 ## Completion criteria
 
-Discovery is complete only when all required documents exist and significant conclusions are evidence-backed.
+Discovery is complete only when all required documents exist, the canonical evidence model is populated, and significant conclusions are evidence-backed.
