@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Application Discovery Model",
+  "type": "object",
+  "required": ["version", "metadata", "application", "entities", "findings", "relationships", "evidence", "open_questions", "conflicts"],
+  "properties": {
+    "version": {"type": "string"},
+    "metadata": {
+      "type": "object",
+      "required": ["repository", "commit", "discovered_at", "agent", "status"],
+      "properties": {
+        "repository": {"type": "string"},
+        "commit": {"type": "string"},
+        "discovered_at": {"type": "string"},
+        "agent": {"type": "string"},
+        "status": {"enum": ["in-progress", "complete", "blocked"]}
+      },
+      "additionalProperties": false
+    },
+    "application": {
+      "type": "object",
+      "required": ["id", "name", "purpose", "scope", "actors", "boundaries"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^application:"},
+        "name": {"type": "string"},
+        "purpose": {"type": "string"},
+        "scope": {"type": "string"},
+        "actors": {"type": "array", "items": {"type": "string"}},
+        "boundaries": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false
+    },
+    "entities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entity"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/finding"}
+    },
+    "relationships": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/relationship"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence"}
+    },
+    "open_questions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/question"}
+    },
+    "conflicts": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/conflict"}
+    }
+  },
+  "$defs": {
+    "entity": {
+      "type": "object",
+      "required": ["id", "type", "name", "description", "evidence"],
+      "properties": {
+        "id": {"type": "string"},
+        "type": {"enum": ["application", "actor", "business-domain", "capability", "business-rule", "workflow", "component", "technology", "database", "schema", "table", "api", "event", "integration", "nfr"]},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]+$"}}
+      },
+      "additionalProperties": false
+    },
+    "finding": {
+      "type": "object",
+      "required": ["id", "type", "name", "description", "classification", "confidence", "evidence", "relationships", "rationale", "open_questions"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^F[0-9]+$"},
+        "type": {"type": "string"},
+        "name": {"type": "string"},
+        "description": {"type": "string"},
+        "classification": {"enum": ["observed", "inferred", "unknown", "conflicting"]},
+        "confidence": {"enum": ["high", "medium", "low", "unknown"]},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]+$"}},
+        "relationships": {"type": "array", "items": {"type": "string", "pattern": "^R[0-9]+$"}},
+        "rationale": {"type": "string"},
+        "open_questions": {"type": "array", "items": {"type": "string", "pattern": "^Q[0-9]+$"}}
+      },
+      "additionalProperties": false
+    },
+    "relationship": {
+      "type": "object",
+      "required": ["id", "source", "type", "target", "evidence", "confidence"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^R[0-9]+$"},
+        "source": {"type": "string"},
+        "type": {"type": "string"},
+        "target": {"type": "string"},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]+$"}},
+        "confidence": {"enum": ["high", "medium", "low", "unknown"]}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "category", "path", "artifact", "description"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^E[0-9]+$"},
+        "category": {"enum": ["source", "config", "schema", "api", "test", "infrastructure", "dependency", "documentation", "runtime"]},
+        "path": {"type": "string"},
+        "artifact": {"type": "string"},
+        "location": {"type": "string"},
+        "description": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "question": {
+      "type": "object",
+      "required": ["id", "question", "related_findings", "priority"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^Q[0-9]+$"},
+        "question": {"type": "string"},
+        "related_findings": {"type": "array", "items": {"type": "string", "pattern": "^F[0-9]+$"}},
+        "priority": {"enum": ["high", "medium", "low"]}
+      },
+      "additionalProperties": false
+    },
+    "conflict": {
+      "type": "object",
+      "required": ["id", "description", "evidence", "affected_entities", "resolution"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^C[0-9]+$"},
+        "description": {"type": "string"},
+        "evidence": {"type": "array", "items": {"type": "string", "pattern": "^E[0-9]+$"}},
+        "affected_entities": {"type": "array", "items": {"type": "string"}},
+        "resolution": {"enum": ["unresolved", "resolved-by-evidence", "accepted-as-inference"]}
+      },
+      "additionalProperties": false
+    }
+  }
+}
