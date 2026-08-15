@@ -1,148 +1,274 @@
 ---
 name: evidence-model
-description: Maintains the canonical machine-readable discovery model that connects repository evidence, findings, classifications, confidence, relationships, unknowns, and conflicts across discovery phases.
+description: Maintains the canonical machine-readable discovery model that connects repository evidence, findings, entities, relationships, confidence, unknowns, and conflicts across discovery phases.
 ---
 
 # Evidence Model
 
 ## Objective
 
-The evidence model is the canonical intermediate representation for application discovery.
+`discovery/discovery-model.yaml` is the canonical intermediate representation for application discovery.
 
-Markdown documents are rendered views of the model. Do not treat the Markdown documents as the primary source of truth.
+Markdown documents are rendered views. They are not the source of truth.
 
-The model lives at:
+## Canonical identity model
 
-`discovery/discovery-model.yaml`
+Use stable IDs for all reusable entities and findings.
 
-## Core rule
+Recommended ID format:
 
-Every significant discovery finding must be traceable to one or more evidence records.
+- `application:<name>`
+- `domain:<name>`
+- `capability:<name>`
+- `rule:<name>`
+- `workflow:<name>`
+- `component:<name>`
+- `technology:<name>`
+- `database:<name>`
+- `schema:<name>`
+- `table:<name>`
+- `api:<name>`
+- `event:<name>`
+- `integration:<name>`
+- `nfr:<name>`
 
-Use stable IDs:
+Use lowercase kebab-case after the prefix.
 
-- `E001`
-- `E002`
-- `E003`
+Do not create duplicate entities when a later phase discovers another reference to the same real-world or technical entity. Reuse the existing ID.
 
-Do not reuse an evidence ID for a materially different artifact or claim.
+## Entity record
+
+```yaml
+entities:
+  - id: component:customer-service
+    type: component
+    name: Customer Service
+    description: Handles customer lifecycle operations.
+    evidence: [E001, E002]
+```
+
+Allowed entity types:
+
+- application
+- actor
+- business-domain
+- capability
+- business-rule
+- workflow
+- component
+- technology
+- database
+- schema
+- table
+- api
+- event
+- integration
+- nfr
 
 ## Evidence record
 
-Use this conceptual shape:
+Every significant discovery must be traceable to evidence.
 
 ```yaml
-- id: E001
-  category: source|config|schema|api|test|infrastructure|dependency|documentation|runtime
-  path: src/example/File.java
-  artifact: ExampleService
-  description: Short description of what the artifact demonstrates.
+evidence:
+  - id: E001
+    category: source
+    path: src/example/File.java
+    artifact: ExampleService
+    location: ExampleService.processCustomer
+    description: Implements customer processing behavior.
 ```
+
+Allowed categories:
+
+- source
+- config
+- schema
+- api
+- test
+- infrastructure
+- dependency
+- documentation
+- runtime
+
+Evidence should identify the smallest useful repository artifact. Never copy secrets or secret values.
 
 ## Finding record
 
-Significant findings should contain:
+Use findings for claims or conclusions that need classification and confidence.
 
 ```yaml
-- id: F001
-  type: business-capability|architecture|technology|nfr|database|integration|application
-  name: Example finding
-  description: Evidence-backed description.
-  classification: observed|inferred|unknown|conflicting
-  confidence: high|medium|low|unknown
-  evidence: [E001, E004]
-  relationships: []
-  rationale: "Required when inferred."
-  open_questions: []
+findings:
+  - id: F001
+    type: business-capability
+    name: Customer Onboarding
+    description: The application supports customer onboarding.
+    classification: observed
+    confidence: high
+    evidence: [E001, E004]
+    relationships: []
+    rationale: ""
+    open_questions: []
 ```
 
-## Classification rules
+Allowed finding types:
+
+- application
+- business-domain
+- business-capability
+- business-rule
+- workflow
+- architecture
+- component
+- technology
+- nfr
+- database
+- integration
+- api
+- event
+
+## Classification
 
 ### observed
-Use when repository artifacts directly establish the finding.
+Directly established by repository evidence.
 
 ### inferred
-Use when multiple pieces of evidence support a conclusion that is not explicitly stated.
+Supported by multiple correlated artifacts but not explicitly stated.
 
 ### unknown
-Use when the repository does not provide enough evidence.
+Insufficient evidence to make a defensible conclusion.
 
 ### conflicting
-Use when artifacts disagree.
+Evidence exists but materially disagrees.
 
-## Confidence rules
+## Confidence
 
-### high
-Directly observed or supported by multiple independent artifacts.
+- `high`: directly established or supported by multiple independent artifacts.
+- `medium`: strong inference from correlated artifacts.
+- `low`: plausible interpretation with limited evidence.
+- `unknown`: insufficient evidence.
 
-### medium
-Strong inference from correlated artifacts.
-
-### low
-Plausible interpretation with limited evidence.
-
-### unknown
-No defensible confidence can be assigned.
+When `classification: inferred`, `rationale` is required.
+When `classification: unknown`, `open_questions` should explain what is missing.
+When `classification: conflicting`, a conflict record should identify the disagreement.
 
 ## Relationships
 
-Use relationships to connect findings across domains.
-
-Examples:
+Relationships are first-class and connect the discovery graph.
 
 ```yaml
 relationships:
-  - type: implemented-by
+  - id: R001
+    source: capability:customer-onboarding
+    type: implemented-by
     target: component:customer-service
-  - type: persists-to
-    target: table:customer
-  - type: calls
-    target: integration:crm
+    evidence: [E010]
+    confidence: high
 ```
 
-Prefer stable semantic IDs over filenames when connecting model entities.
+Common relationship types:
 
-## Unknowns
+- contains
+- part-of
+- implements
+- implemented-by
+- realizes
+- persists-to
+- reads-from
+- writes-to
+- calls
+- called-by
+- publishes
+- consumes
+- depends-on
+- uses
+- exposes
+- invokes
+- secured-by
+- configured-by
+- deployed-on
+- communicates-with
+- related-to
 
-Unknowns are first-class discoveries. Do not silently omit them.
+Only add a relationship when repository evidence supports it. The relationship itself should have evidence and confidence.
 
-Example:
+## Open questions
+
+Unknowns are first-class discoveries.
 
 ```yaml
 open_questions:
   - id: Q001
-    question: "What is the business owner for this workflow?"
+    question: What is the business owner for this workflow?
     related_findings: [F007]
+    priority: medium
 ```
+
+Allowed priority values:
+
+- high
+- medium
+- low
 
 ## Conflicts
 
-Record contradictory evidence explicitly:
+Record contradictions instead of silently selecting one interpretation.
 
 ```yaml
 conflicts:
   - id: C001
-    description: "Configuration references Service A, but no runtime usage was found."
+    description: Configuration references Service A, but no runtime usage was found.
     evidence: [E021, E034]
-    resolution: "Unresolved"
+    affected_entities: [integration:service-a]
+    resolution: unresolved
 ```
 
-## Workflow
+Allowed resolution values:
 
-Each discovery skill should:
+- unresolved
+- resolved-by-evidence
+- accepted-as-inference
 
-1. Read the existing model.
-2. Add or refine evidence.
-3. Add findings.
-4. Link findings to evidence.
-5. Add relationships.
-6. Record unknowns and conflicts.
-7. Preserve prior findings unless new evidence invalidates them.
+## Phase rules
 
-Do not allow later phases to overwrite earlier evidence merely because a different interpretation is more convenient.
+Every discovery skill must:
 
-## Markdown rendering
+1. Read the current model before analysis.
+2. Preserve existing evidence IDs.
+3. Reuse existing entity IDs.
+4. Add new evidence rather than replacing old evidence.
+5. Add or refine findings.
+6. Add evidence-backed relationships.
+7. Record unknowns and conflicts.
+8. Never silently delete an earlier finding.
 
-The documentation-generation skill should render Markdown from the model.
+If new evidence changes an earlier conclusion, retain the original evidence and update the finding with the new classification/rationale.
 
-If a Markdown statement cannot be traced back to the model, it should not be presented as a discovery fact.
+## Cross-domain linking
+
+The following links are especially valuable:
+
+```text
+business capability
+    -> implemented-by -> component
+component
+    -> persists-to -> table
+component
+    -> calls -> integration
+component
+    -> uses -> technology
+workflow
+    -> invokes -> api
+business rule
+    -> applies-to -> capability
+component
+    -> communicates-with -> component
+```
+
+These relationships are what allow later modernization agents to reason from business behavior through legacy implementation and technical dependencies.
+
+## Rendering rule
+
+Documentation generation must read the model and render Markdown from it.
+
+A Markdown claim that has no corresponding model finding/evidence must not be presented as an established discovery fact.
