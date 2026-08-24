@@ -1,0 +1,65 @@
+version: "1.2"
+metadata:
+  repository: ""
+  commit: ""
+  discovered_at: ""
+  agent: "application-discovery"
+  status: "in-progress"
+
+application:
+  id: "application:main"
+  name: ""
+  purpose: ""
+  scope: ""
+  actors: []
+  boundaries: []
+
+entities: []
+findings: []
+relationships: []
+components: []
+business_domains: []
+
+architecture:
+  style: []
+  components: []
+  interactions: []
+  deployment: []
+
+technology_stack:
+  languages: []
+  frameworks: []
+  libraries: []
+  databases: []
+  messaging: []
+  apis: []
+  infrastructure: []
+  build_and_delivery: []
+  observability: []
+  file_processing: []
+
+non_functional:
+  scalability: []
+  availability: []
+  resilience: []
+  performance: []
+  security: []
+  reliability: []
+  observability: []
+  maintainability: []
+  recoverability: []
+
+databases:
+  technologies: []
+  schemas: []
+  tables: []
+  relationships: []
+  views: []
+  procedures: []
+  triggers: []
+
+file_layouts: []
+integrations: []
+evidence: []
+open_questions: []
+conflicts: []

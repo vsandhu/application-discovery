@@ -4,7 +4,7 @@
     "agentStop": [
       {
         "type": "command",
-        "command": "bash scripts/validate-discovery.sh",
+        "command": "powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File scripts/validate-discovery.ps1",
         "timeout": 10000
       }
     ]
