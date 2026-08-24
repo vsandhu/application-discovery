@@ -1,6 +1,6 @@
 ---
 name: application-discovery
-description: Reverse engineers an existing application and produces evidence-backed documentation covering application purpose, business domains, architecture, technology stack, non-functional characteristics, database structures, and external integrations.
+description: Reverse engineers an existing application and produces evidence-backed documentation covering application purpose, business domains, architecture, technology stack, non-functional characteristics, database structures, external integrations, and text-file layouts with field lineage.
 user-invocable: true
 disable-model-invocation: false
 ---
@@ -36,7 +36,7 @@ Before starting detailed discovery:
 2. Preserve existing evidence and findings.
 3. Add stable evidence IDs rather than replacing evidence.
 4. Link significant findings to evidence IDs.
-5. Record relationships between application, business, architecture, data, technology, NFR, and integration findings.
+5. Record relationships between application, business, architecture, data, technology, NFR, integration, and file-layout findings.
 6. Record unknowns and conflicting evidence explicitly.
 
 Do not allow a later phase to silently overwrite an earlier finding. Refine or supersede it with new evidence.
@@ -64,6 +64,7 @@ Identify:
 - deployment artifacts
 - tests
 - important documentation
+- text/flat files and file-processing code
 
 Do not start by reading every source file.
 
@@ -80,6 +81,7 @@ Identify:
 - event consumers/producers
 - major modules
 - interfaces to external systems
+- file-based input/output boundaries
 
 Add application and component findings to the model.
 
@@ -118,6 +120,7 @@ Determine:
 - external dependencies
 - runtime architecture
 - deployment architecture where evidence exists
+- file-processing and batch boundaries
 
 Use Mermaid diagrams where useful in the rendered documentation, but treat the evidence model as the source of truth.
 
@@ -138,6 +141,7 @@ Determine:
 - cloud services
 - CI/CD
 - observability
+- file-processing libraries
 
 Never invent versions.
 
@@ -177,10 +181,56 @@ Identify:
 - external databases
 - authentication providers
 - external platforms
+- file-based integrations
 
 Correlate configuration with actual code usage and classify integrations as active, configured-but-unconfirmed, suspected historical/unused, or unknown.
 
-### Phase 8 — Non-functional characteristics
+### Phase 8 — Text file layout and field lineage
+
+Use `file-layout-discovery`.
+
+Identify CSV, delimited, fixed-length/fixed-width, positional, flat-file, batch input/output, and other text-based data files used by the application.
+
+For every discovered file format determine, where evidence permits:
+- file name or pattern
+- purpose
+- input/output direction
+- record type
+- delimiter
+- header/trailer
+- encoding
+- record length
+- field order
+- field name
+- ordinal position
+- start/end position for fixed-width files
+- field length
+- data type
+- source type
+- source database table/column
+- calculation/transformation
+- constant/configuration/external source
+- evidence
+- classification
+- confidence
+
+The critical output is **field-level lineage**.
+
+For each field classify its source as:
+- Database
+- Calculated
+- Constant
+- Configuration
+- External
+- Unknown
+
+For calculated fields, describe the calculation or transformation and identify its underlying source fields where possible.
+
+For database-sourced fields, trace the value through the mapper/service/query/ORM to the actual table and column where possible.
+
+For fixed-length files, verify whether positions are zero-based or one-based before documenting them. Never guess.
+
+### Phase 9 — Non-functional characteristics
 
 Use `nfr-discovery`.
 
@@ -197,7 +247,7 @@ Analyze evidence for:
 
 Never claim a guarantee unless explicitly documented.
 
-### Phase 9 — Evidence consolidation
+### Phase 10 — Evidence consolidation
 
 Use the `evidence-model` skill.
 
@@ -205,11 +255,13 @@ Validate that:
 - evidence IDs are unique
 - findings reference valid evidence
 - relationships reference valid model entities
+- file layouts reference valid evidence
+- field lineage references valid database entities where claimed
 - unknowns are recorded
 - conflicts are recorded
 - confidence is present
 
-### Phase 10 — Documentation
+### Phase 11 — Documentation
 
 Use `documentation-generation`.
 
@@ -226,7 +278,9 @@ Generate:
 
 The Markdown must be rendered from the canonical model. If a statement cannot be traced to the model, do not present it as a discovery fact.
 
-### Phase 11 — Validation
+File layouts and field lineage must be included in the appropriate discovery output and evidence index. Do not create a separate unsupported source of truth.
+
+### Phase 12 — Validation
 
 Before completion:
 - verify all required documents exist
@@ -238,9 +292,12 @@ Before completion:
 - verify no secrets were copied
 - verify application source files were not modified
 - verify the canonical model is valid YAML
+- verify file-layout mappings have evidence
+- verify fixed-width positions are internally consistent
+- verify field lineage does not claim a database source without supporting evidence
 
 If validation fails, correct the discovery artifacts.
 
 ## Completion criteria
 
-Discovery is complete only when all required documents exist, the canonical evidence model is populated, and significant conclusions are evidence-backed.
+Discovery is complete only when all required documents exist, the canonical evidence model is populated, significant conclusions are evidence-backed, and discovered text-file fields have source lineage or are explicitly marked unknown.
