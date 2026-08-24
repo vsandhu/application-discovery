@@ -1,4 +1,4 @@
-version: "1.1"
+version: "1.2"
 metadata:
   repository: ""
   commit: ""
@@ -14,18 +14,10 @@ application:
   actors: []
   boundaries: []
 
-# Canonical cross-domain entities. Category-specific sections below are
-# projections/convenience groupings; stable IDs should be reused everywhere.
 entities: []
-
-# Canonical claims discovered by the agent.
 findings: []
-
-# Canonical relationships between entities/findings.
 relationships: []
-
 components: []
-
 business_domains: []
 
 architecture:
@@ -44,6 +36,7 @@ technology_stack:
   infrastructure: []
   build_and_delivery: []
   observability: []
+  file_processing: []
 
 non_functional:
   scalability: []
@@ -65,9 +58,8 @@ databases:
   procedures: []
   triggers: []
 
+file_layouts: []
 integrations: []
-
 evidence: []
-
 open_questions: []
 conflicts: []
